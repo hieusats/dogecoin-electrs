@@ -21,7 +21,7 @@ arraydeque = "0.5.1"
 arrayref = "0.3.6"
 base64 = "0.22"
 bincode = "1.3.1"
-bitcoin = { git = "https://github.com/LuckyCoinProj/rust-lky", rev = "a674323fb969acd35c6fb13434d9490c261c295d", features = [ "serde" ] }
+bitcoin = { git = "https://github.com/hieusats/rust-dogecoin", rev = "0b2a74dd2842ee9e2da6ece3cbcd4439db07d5dd", features = [ "serde" ] }
 clap = "2.33.3"
 crossbeam-channel = "0.5.0"
 dirs = "5.0.1"
