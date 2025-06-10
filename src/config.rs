@@ -95,7 +95,7 @@ impl Config {
             .arg(
                 Arg::with_name("daemon_dir")
                     .long("daemon-dir")
-                    .help("Data directory of Bitcoind (default: ~/.bitcoin/)")
+                    .help("Data directory of Bitcoind (default: ~/.dogecoin/)")
                     .takes_value(true),
             )
             .arg(
@@ -361,7 +361,7 @@ impl Config {
             .map(PathBuf::from)
             .unwrap_or_else(|| {
                 let mut default_dir = home_dir().expect("no homedir");
-                default_dir.push(".bitcoin");
+                default_dir.push(".dogecoin");
                 default_dir
             });
 

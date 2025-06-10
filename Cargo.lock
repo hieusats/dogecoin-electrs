@@ -253,7 +253,7 @@ dependencies = [
 [[package]]
 name = "bitcoin"
 version = "0.31.2"
-source = "git+https://github.com/LuckyCoinProj/rust-lky?rev=a674323fb969acd35c6fb13434d9490c261c295d#a674323fb969acd35c6fb13434d9490c261c295d"
+source = "git+https://github.com/hieusats/rust-dogecoin?rev=0b2a74dd2842ee9e2da6ece3cbcd4439db07d5dd#0b2a74dd2842ee9e2da6ece3cbcd4439db07d5dd"
 dependencies = [
  "bech32 0.10.0-beta",
  "bitcoin-internals 0.2.0",
@@ -762,7 +762,7 @@ dependencies = [
  "arrayref",
  "base64 0.22.1",
  "bincode",
- "bitcoin 0.31.2 (git+https://github.com/LuckyCoinProj/rust-lky?rev=a674323fb969acd35c6fb13434d9490c261c295d)",
+ "bitcoin 0.31.2 (git+https://github.com/hieusats/rust-dogecoin?rev=0b2a74dd2842ee9e2da6ece3cbcd4439db07d5dd)",
  "bitcoind 0.35.2",
  "clap",
  "crossbeam-channel",
