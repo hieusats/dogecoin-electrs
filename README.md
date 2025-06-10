@@ -1,8 +1,8 @@
-# Esplora - Electrs backend API
+# Dogecoin Electrs
 
-A block chain index engine and HTTP API written in Rust based on [romanz/electrs](https://github.com/romanz/electrs).
+An Electrum server for Dogecoin, written in Rust. Based on [romanz/electrs](https://github.com/romanz/electrs) and [Esplora](https://github.com/Blockstream/esplora).
 
-Used as the backend for the [Esplora block explorer](https://github.com/Blockstream/esplora) powering [blockstream.info](https://blockstream.info/).
+Provides a backend for Electrum-DOGE wallets and a block explorer API.
 
 API documentation [is available here](https://github.com/blockstream/esplora/blob/master/API.md).
 
@@ -10,34 +10,36 @@ Documentation for the database schema and indexing process [is available here](d
 
 ### Installing & indexing
 
-Install Rust, Bitcoin Core (no `txindex` needed) and the `clang` and `cmake` packages, then:
+First, install Rust and Dogecoin Core. Then, you can build and run `dogecoin-electrs`:
 
 ```bash
-$ git clone https://github.com/blockstream/electrs && cd electrs
-$ git checkout new-index
-$ cargo run --release --bin electrs -- -vvvv --daemon-dir ~/.bitcoin
+# Clone the repository
+$ git clone https://github.com/hieusats/dogecoin-electrs.git
+$ cd dogecoin-electrs
 
-# Or for liquid:
-$ cargo run --features liquid --release --bin electrs -- -vvvv --network liquid --daemon-dir ~/.liquid
+# Build the project
+$ cargo build --release
+
+# Run for Dogecoin mainnet
+$ ./target/release/electrs -vvvv --network mainnet --daemon-dir ~/.dogecoin --daemon-rpc-addr 127.0.0.1:22555
+
+# Run for Dogecoin testnet
+$ ./target/release/electrs -vvvv --network testnet --daemon-dir ~/.dogecoin/testnet3 --daemon-rpc-addr 127.0.0.1:44555
 ```
 
-See [electrs's original documentation](https://github.com/romanz/electrs/blob/master/doc/usage.md) for more detailed instructions.
-Note that our indexes are incompatible with electrs's and has to be created separately.
+The server needs to be connected to a running `dogecoind` instance. Make sure to configure your `dogecoin.conf` with `rpcuser` and `rpcpassword`, or a RPC cookie file.
 
-The indexes require 610GB of storage after running compaction (as of June 2020), but you'll need to have
-free space of about double that available during the index compaction process.
-Creating the indexes should take a few hours on a beefy machine with SSD.
+The indexes can take up a significant amount of disk space and may take several hours to build initially.
 
-To deploy with Docker, follow the [instructions here](https://github.com/Blockstream/esplora#how-to-build-the-docker-image).
+To deploy with Docker, follow the [instructions here](https://github.com/Blockstream/esplora#how-to-build-the-docker-image) (Note: you will need to adapt the instructions for this Dogecoin version).
 
 ### Light mode
 
 For personal or low-volume use, you may set `--lightmode` to reduce disk storage requirements
 by roughly 50% at the cost of slower and more expensive lookups.
 
-With this option set, raw transactions and metadata associated with blocks will not be kept in rocksdb
-(the `T`, `X` and `M` indexes),
-but instead queried from bitcoind on demand.
+With this option set, raw transactions and metadata associated with blocks will not be kept in the database,
+but instead queried from `dogecoind` on demand.
 
 ### Notable changes from Electrs:
 
@@ -52,33 +54,31 @@ but instead queried from bitcoind on demand.
   - A map of blockhash to txids is kept in the database under the prefix `X`.
   - Block stats metadata (number of transactions, size and weight) is kept in the database under the prefix `M`.
 
-  With these new indexes, bitcoind is no longer queried to serve user requests and is only polled
+  With these new indexes, `dogecoind` is no longer queried to serve user requests and is only polled
   periodically for new blocks and for syncing the mempool.
-
-- Support for Liquid and other Elements-based networks, including CT, peg-in/out and multi-asset.
-  (requires enabling the `liquid` feature flag using `--features liquid`)
 
 ### CLI options
 
-In addition to electrs's original configuration options, a few new options are also available:
+A summary of important configuration options:
 
+- `--daemon-dir <dir>` - Dogecoin data directory (default: `~/.bitcoin`). It's recommended to set this to `~/.dogecoin`.
+- `--daemon-rpc-addr <addr:port>` - Dogecoin daemon JSONRPC address to connect to (e.g. `127.0.0.1:22555` for mainnet).
+- `--cookie <user:pass>` - JSONRPC authentication cookie (`USER:PASSWORD`).
+- `--auth <user:pass>` - JSONRPC authentication credentials (`USER:PASSWORD`). Overrides `--cookie`.
+- `--network <network>` - Select network type (`mainnet`, `testnet`, `regtest`).
 - `--http-addr <addr:port>` - HTTP server address/port to listen on (default: `127.0.0.1:3000`).
-- `--lightmode` - enable light mode (see above)
-- `--cors <origins>` - origins allowed to make cross-site request (optional, defaults to none).
+- `--lightmode` - enable light mode (see above).
 - `--address-search` - enables the by-prefix address search index.
 - `--index-unspendables` - enables indexing of provably unspendable outputs.
 - `--utxos-limit <num>` - maximum number of utxos to return per address.
 - `--electrum-txs-limit <num>` - maximum number of txs to return per address in the electrum server (does not apply for the http api).
 - `--electrum-banner <text>` - welcome banner text for electrum server.
 
-Additional options with the `liquid` feature:
-- `--parent-network <network>` - the parent network this chain is pegged to.
-
 Additional options with the `electrum-discovery` feature:
 - `--electrum-hosts <json>` - a json map of the public hosts where the electrum server is reachable, in the [`server.features` format](https://electrumx.readthedocs.io/en/latest/protocol-methods.html#server.features).
 - `--electrum-announce` - announce the electrum server on the electrum p2p server discovery network.
 
-See `$ cargo run --release --bin electrs -- --help` for the full list of options.
+See `./target/release/electrs --help` for the full list of options.
 
 ## License
 
